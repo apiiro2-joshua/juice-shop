@@ -18,6 +18,9 @@ const expect = chai.expect
 
 chai.use(sinonChai)
 
+// Test-only unsigned JWT tokens for challenge verification tests
+const TEST_JWT_UNSIGNED = 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJkYXRhIjp7ImVtYWlsIjoiand0bjNkQGp1aWNlLXNoLm9wIn0sImlhdCI6MTUwODYzOTYxMiwiZXhwIjo5OTk5OTk5OTk5fQ.'
+
 describe('verify', () => {
   let req: any
   let res: any
@@ -260,7 +263,7 @@ describe('verify', () => {
       Header: { "alg": "none", "typ": "JWT" }
       Payload: { "data": { "email": "jwtn3d@juice-sh.op" }, "iat": 1508639612, "exp": 9999999999 }
        */
-      req.headers = { authorization: 'Bearer eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJkYXRhIjp7ImVtYWlsIjoiand0bjNkQGp1aWNlLXNoLm9wIn0sImlhdCI6MTUwODYzOTYxMiwiZXhwIjo5OTk5OTk5OTk5fQ.' }
+      req.headers = { authorization: `Bearer ${TEST_JWT_UNSIGNED}` }
 
       verify.jwtChallenges()(req, res, next)
 

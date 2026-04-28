@@ -85,7 +85,8 @@ router.post('/', async (req: Request<Record<string, unknown>, Record<string, unk
       }
     } else {
       res.render('dataErasureResult', {
-        ...req.body
+        email: req.body.email,
+        securityAnswer: req.body.securityAnswer
       })
     }
   } catch (error) {

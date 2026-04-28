@@ -4,9 +4,14 @@ import { safeLoad } from 'js-yaml'
 import logger from '../lib/logger'
 import { type ChallengeKey } from 'models/challenge'
 
+function resolveEnvVars (content: string): string {
+  return content.replace(/\$([A-Z_][A-Z0-9_]*)/g, (_, name) => process.env[name] ?? '')
+}
+
 export async function loadStaticData (file: string) {
   const filePath = path.resolve('./data/static/' + file + '.yml')
   return await readFile(filePath, 'utf8')
+    .then(resolveEnvVars)
     .then(safeLoad)
     .catch(() => logger.error('Could not open file: "' + filePath + '"'))
 }

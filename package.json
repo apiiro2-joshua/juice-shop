@@ -279,5 +279,17 @@
       "angular",
       "inject"
     ]
+  },
+  "resolutions": {
+    "json-schema": ">=0.4.0",
+    "minimist": ">=1.2.6",
+    "lodash": ">=4.17.21",
+    "extend": ">=3.0.2"
+  },
+  "overrides": {
+    "json-schema": ">=0.4.0",
+    "minimist": ">=1.2.6",
+    "lodash": ">=4.17.21",
+    "extend": ">=3.0.2"
   }
 }
