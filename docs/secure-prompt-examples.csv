@@ -1,0 +1,104 @@
+"prompt","file_path","before","after"
+"add a new REST endpoint to search orders by date range using Sequelize raw query","None","add a new REST endpoint to search orders by date range using Sequelize raw query","add a new REST endpoint to search orders by date range using Sequelize raw query
+
+Security Requirements:
+Authentication: Authenticate callers to the new REST endpoint using Express JWT Node (see package.json:133); reuse the existing middleware rather than introducing a new one.
+Input Validation: Validate all input parameters for the date range search, including start and end dates, to prevent SQL injection and other attacks. Since the repository handles PII (profile.hasPiiData: true), ensure that date inputs cannot be manipulated to expose sensitive data.
+Sensitive Data Handling:
+PII Protection: Since the repository handles PII (profile.hasPiiData: true), ensure that any order data returned by the search endpoint is handled according to existing PII protection policies.
+Data Storage: Use Sequelize Node for database interactions, ensuring that raw queries are properly parameterized to prevent SQL injection vulnerabilities.
+Error Handling and Logging: Log all errors and unusual activities using Winston Node (see lib/logger.ts) or Morgan Node (see server.ts), ensuring that sensitive information is filtered from log outputs.
+Rate Limiting: Implement rate limiting on the new search endpoint to prevent abuse and denial-of-service attacks."
+"add a refresh token endpoint that issues new JWTs when the current token is about to expire","routes/login.ts","add a refresh token endpoint that issues new JWTs when the current token is about to expire","add a refresh token endpoint that issues new JWTs when the current token is about to expire
+
+Security Requirements:
+Authentication: The refresh token endpoint must properly authenticate the refresh token using Express JWT Node (see package.json:133). Reuse the existing authentication middleware rather than introducing a new one.
+Input Validation: Strictly validate all input to the refresh token endpoint, especially the refresh token itself, to prevent injection attacks and ensure it conforms to expected formats.
+Sensitive Data Handling:
+API Keys: Ensure that any keys used for signing or encrypting JWTs are stored securely using HashiCorp Vault (configured at key-management.json:0) and retrieved at runtime, never hardcoded.
+Encryption: Use JSON Web Token Node (see lib/insecurity.ts:0) for signing and verifying JWTs. Ensure that refresh tokens are securely stored (e.g., HTTP-only cookies, encrypted database) and invalidated after use or compromise.
+PII Protection: Since the repository handles PII (profile.hasPiiData: true), ensure that no PII is inadvertently exposed or stored within JWTs or refresh tokens.
+Error Handling and Logging: Log all successful and failed refresh token attempts using Morgan Node (see server.ts:0) or Winston Node (see lib/logger.ts:0). Ensure that sensitive information, such as the refresh token itself, is filtered from log output.
+Rate Limiting: Implement rate limiting on the refresh token endpoint to prevent brute-force attacks and token abuse.
+Web Page Security:
+Secure Cookies: If refresh tokens are stored in cookies, ensure they are set with the HttpOnly, Secure, and SameSite=Lax attributes to prevent client-side access and cross-site request forgery."
+"add support for uploading PDF invoices to the complaint form and storing them on disk","routes/fileUpload.ts","add support for uploading PDF invoices to the complaint form and storing them on disk","add support for uploading PDF invoices to the complaint form and storing them on disk
+
+Security Requirements:
+Authentication: Authenticate users uploading PDF invoices using existing authentication mechanisms such as Express JWT Node (see package.json:133). Reuse the detected middleware rather than introducing a new one.
+Input Validation: Validate all uploaded files to ensure they are legitimate PDF documents and do not contain malicious content. Implement server-side validation for file type, size, and content.
+Sensitive Data Handling:
+PII Protection: Since the repository handles PII (profile.hasPiiData: true), ensure that any PII contained within the uploaded PDF invoices is handled according to existing PII protection policies. This includes minimizing PII collection, encrypting PII at rest, and restricting access to authorized personnel.
+Data Storage: Store uploaded PDF invoices securely on disk with appropriate access controls. Ensure that the storage location is not publicly accessible and that file permissions are set to the principle of least privilege.
+Error Handling and Logging: Log all file upload attempts, including successes and failures, using Winston Node (see lib/logger.ts:0) or Morgan Node (see server.ts:0). Ensure that sensitive information from the complaint form or PDF content is filtered from log outputs to prevent accidental exposure.
+Web Page Security:
+CSRF Protection: Implement CSRF protection for the complaint form to prevent unauthorized file uploads.
+Content Security Policy (CSP): Ensure the CSP is configured to allow file uploads from trusted sources and prevent cross-site scripting attacks.
+Security Headers: Configure appropriate security headers (e.g., X-Content-Type-Options, X-Frame-Options) for the complaint form page."
+"add a bulk user export endpoint for admins that returns all user records as CSV","None","add a bulk user export endpoint for admins that returns all user records as CSV","add a bulk user export endpoint for admins that returns all user records as CSV
+
+Security Requirements:
+Authentication: Authenticate administrators accessing the bulk user export endpoint using existing mechanisms such as Express JWT Node (see package.json:133). Reuse the detected authentication middleware rather than introducing a new one.
+Authorization: Implement robust authorization checks to ensure only authorized administrators can access and trigger the bulk user export. This endpoint exposes sensitive user data, so access must be strictly controlled.
+Input Validation: Validate any input parameters for the export endpoint (e.g., filters, date ranges) to prevent injection attacks and ensure data integrity.
+Sensitive Data Handling:
+PII Protection: Since the repository handles PII (profile.hasPiiData: true), ensure that the CSV export correctly handles all user records, redacting or masking sensitive fields as per data privacy policies, and that the export process itself is auditable.
+Encryption: Encrypt the CSV file at rest before making it available for download.
+Data Storage: If the CSV export is temporarily stored, ensure it is stored securely with appropriate access controls and promptly deleted after download or after a defined retention period.
+Error Handling and Logging: Log all access attempts, successful exports, and any errors related to the bulk user export endpoint using Winston Node (see lib/logger.ts:0) or Morgan Node (see server.ts:0). Ensure that sensitive user data is not inadvertently logged.
+Rate Limiting: Implement rate limiting on the bulk user export endpoint to prevent abuse and brute-force attempts."
+"add a Slack webhook integration that posts a message when a new product review is submitted","lib/webhook.ts","add a Slack webhook integration that posts a message when a new product review is submitted","add a Slack webhook integration that posts a message when a new product review is submitted
+
+Security Requirements:
+Sensitive Data Handling:
+API Keys: Store the Slack webhook URL securely using HashiCorp Vault (configured at key-management.json:0) and retrieve it at runtime; never hardcode it.
+PII Protection: Since the repository handles PII (profile.hasPiiData: true), ensure that any personally identifiable information from product reviews is not sent to Slack unless explicitly approved and properly masked or anonymized.
+Error Handling and Logging: Log any errors or failures when attempting to post to the Slack webhook using Winston Node (configured at lib/logger.ts:0) or Morgan Node (configured at server.ts:0), and ensure sensitive details like the full webhook URL or review content are filtered from the logs.
+Third-Party Integration: Communicate with the Slack webhook over HTTPS with verified TLS certificates. Implement appropriate timeouts for the Slack API calls. Validate the structure and content of the message payload before sending it to Slack to prevent malformed requests or data leakage."
+"implement a time-limited password reset token using crypto.randomBytes and store it in the User model","lib/insecurity.ts","implement a time-limited password reset token using crypto.randomBytes and store it in the User model","implement a time-limited password reset token using crypto.randomBytes and store it in the User model
+
+Security Requirements:
+Authentication: Authenticate users requesting a password reset using existing authentication mechanisms such as Express JWT Node (see package.json:133).
+Sensitive Data Handling:
+Secrets: Store the generated password reset token securely in the User model. Ensure that the token is not exposed in logs or error messages.
+Encryption: Use crypto.randomBytes to generate a cryptographically secure, unpredictable token. Ensure the token is hashed before storage in the User model. The token should be time-limited and invalidated after a single use or expiration.
+PII Protection: Since the repository handles PII (profile.hasPiiData: true), ensure that the password reset process and token handling comply with PII protection policies, preventing unauthorized access or disclosure of user data.
+Error Handling and Logging: Log password reset requests and token generation events using Winston Node (see lib/logger.ts:0) or Morgan Node (see server.ts:0). Ensure that the actual password reset token is never logged. Log only necessary metadata such as user ID and timestamp.
+Rate Limiting: Implement rate limiting on password reset requests to prevent abuse and brute-force attacks against user accounts."
+"add coupon code validation that checks format and expiration before applying discount to basket","routes/coupon.ts","add coupon code validation that checks format and expiration before applying discount to basket","add coupon code validation that checks format and expiration before applying discount to basket
+
+Security Requirements:
+Authentication: Authenticate all requests to the basket API using an existing authentication framework such as Express JWT Node (see package.json:133). Reuse the detected middleware rather than introducing a new one.
+Input Validation: Validate the coupon code format and expiration date server-side to prevent deserialization vulnerabilities.
+Sensitive Data Handling:
+PII Protection: Since the repository handles PII (profile.hasPiiData: true), ensure that any personal data associated with the basket or coupon application is handled according to existing PII protection controls.
+Error Handling and Logging: Log all coupon code validation attempts, successes, and failures using Morgan Node (see server.ts:0), Winston Node (see lib/logger.ts:0). Ensure that sensitive information is filtered from log outputs.
+Rate Limiting: Implement rate limiting on the coupon code application endpoint to prevent brute-force attacks or enumeration of valid coupon codes."
+"add a GitHub Actions workflow that runs OWASP ZAP DAST scan against the staging deployment",".github/workflows/zap_scan.yml","add a GitHub Actions workflow that runs OWASP ZAP DAST scan against the staging deployment","add a GitHub Actions workflow that runs OWASP ZAP DAST scan against the staging deployment
+
+Security Requirements:
+Sensitive Data Handling:
+Secrets: Ensure that any credentials or sensitive configuration required for the OWASP ZAP scan to access the staging environment are stored securely using HashiCorp Vault (configured at key-management.json:0) and are not hardcoded in the workflow file. Access these secrets at runtime through GitHub Actions' secret management, which integrates with Vault.
+Error Handling and Logging: Configure the GitHub Actions workflow to log the OWASP ZAP scan results and any errors encountered during the scan. Use existing logging practices to ensure consistent log formatting and retention, and filter any sensitive information from the logs.
+Third-Party Integration: The GitHub Actions workflow, which integrates with OWASP ZAP, must ensure that all communications with the staging deployment are performed over HTTPS with verified TLS certificates. Configure appropriate timeouts for the DAST scan to prevent indefinite execution."
+"add an endpoint that lets users submit their Ethereum wallet address to claim NFT rewards","routes/web3Wallet.ts","add an endpoint that lets users submit their Ethereum wallet address to claim NFT rewards","add an endpoint that lets users submit their Ethereum wallet address to claim NFT rewards
+
+Security Requirements:
+Authentication: Authenticate users submitting their Ethereum wallet address using Express JWT Node (see package.json:133); reuse the existing middleware rather than introducing a new one.
+Input Validation: Validate the submitted Ethereum wallet address for correct format and length to prevent malformed input.
+Sensitive Data Handling:
+PII Protection: Since the repository handles PII (profile.hasPiiData: true), ensure that Ethereum wallet addresses, while public, are treated with appropriate privacy considerations, especially if linked to other user data.
+Error Handling and Logging: Log all submissions and any errors encountered using Morgan Node (see server.ts:0) or Winston Node (see lib/logger.ts:0), ensuring that no sensitive user data beyond the wallet address itself is logged in plain text.
+Rate Limiting: Implement rate limiting on the new endpoint to prevent abuse and denial-of-service attacks."
+"extend the data export endpoint to include the user's order history and payment methods","routes/dataExport.ts","extend the data export endpoint to include the user's order history and payment methods","extend the data export endpoint to include the user's order history and payment methods
+
+Security Requirements:
+Authentication: Authenticate callers to the data export endpoint using existing authentication mechanisms such as Express JWT Node (see package.json:133). Reuse the detected middleware rather than introducing a new one.
+Authorization: Restrict access to the data export endpoint to authorized users only, ensuring that users can only export their own order history and payment methods.
+Input Validation: Validate all input parameters for the data export endpoint to prevent injection attacks and ensure data integrity.
+Sensitive Data Handling:
+PII Protection: Since the repository handles PII (profile.hasPiiData: true), ensure that all exported user order history and payment method data is handled according to existing PII protection policies. Implement strict access controls and ensure data minimization.
+Encryption: Encrypt sensitive data at rest. Reuse existing frameworks instead of introducing new cryptographic libraries.
+Secrets: Store any credentials or API keys required for accessing order history or payment method data using HashiCorp Vault (configured at key-management.json) and retrieve them at runtime; never hardcode them.
+Error Handling and Logging: Log all data export requests, including successful exports and any errors, using Morgan Node (configured at server.ts), Winston Node (configured at lib/logger.ts). Ensure that sensitive information is filtered from log outputs to prevent accidental exposure.
+Rate Limiting: Implement rate limiting on the data export endpoint to prevent abuse and denial-of-service attacks."
