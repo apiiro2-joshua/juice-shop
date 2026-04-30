@@ -1,6 +1,7 @@
 import path from 'node:path'
 import { readFile } from 'node:fs/promises'
 import { safeLoad } from 'js-yaml'
+import config from 'config'
 import logger from '../lib/logger'
 import { type ChallengeKey } from 'models/challenge'
 
@@ -71,7 +72,9 @@ export interface StaticUserCard {
   expYear: number
 }
 export async function loadStaticUserData (): Promise<StaticUser[]> {
-  return await loadStaticData('users') as StaticUser[]
+  const users = await loadStaticData('users') as StaticUser[]
+  const wurstbrotTotp = config.get<string>('application.demoSeedTotpSecrets.wurstbrot')
+  return users.map((u) => u.key === 'timo' ? { ...u, totpSecret: wurstbrotTotp } : u)
 }
 
 export interface StaticChallenge {

@@ -71,6 +71,8 @@ application:
       - { uri: 'http://192.168.99.100:4200', proxy: 'https://localmac.owasp-juice.shop' }
       - { uri: 'http://penguin.termina.linux.test:3000', proxy: 'https://localchromeos.owasp-juice.shop' }
       - { uri: 'http://penguin.termina.linux.test:4200', proxy: 'https://localchromeos.owasp-juice.shop' }
+  demoSeedTotpSecrets:
+    wurstbrot: 'IFTXE3SPOEYVURT2MRYGI52TKJ4HC3KH'
 challenges:
   showSolvedNotifications: true
   showHints: true
