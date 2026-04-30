@@ -1,14 +1,33 @@
 import path from 'node:path'
 import { readFile } from 'node:fs/promises'
 import { safeLoad } from 'js-yaml'
+import config from 'config'
 import logger from '../lib/logger'
 import { type ChallengeKey } from 'models/challenge'
 
+const STATIC_DATA_DIR = path.resolve('./data/static')
+
+function resolveStaticYamlPath (file: string): string | null {
+  if (!file || file.includes('\0')) {
+    return null
+  }
+  const filePath = path.resolve(STATIC_DATA_DIR, `${file}.yml`)
+  const relativeToBase = path.relative(STATIC_DATA_DIR, filePath)
+  if (relativeToBase.startsWith('..') || path.isAbsolute(relativeToBase)) {
+    return null
+  }
+  return filePath
+}
+
 export async function loadStaticData (file: string) {
-  const filePath = path.resolve('./data/static/' + file + '.yml')
+  const filePath = resolveStaticYamlPath(file)
+  if (filePath === null) {
+    logger.error('Rejected unsafe static data path request')
+    return
+  }
   return await readFile(filePath, 'utf8')
     .then(safeLoad)
-    .catch(() => logger.error('Could not open file: "' + filePath + '"'))
+    .catch(() => logger.error('Could not open static data file'))
 }
 
 export interface StaticUser {
@@ -53,7 +72,9 @@ export interface StaticUserCard {
   expYear: number
 }
 export async function loadStaticUserData (): Promise<StaticUser[]> {
-  return await loadStaticData('users') as StaticUser[]
+  const users = await loadStaticData('users') as StaticUser[]
+  const wurstbrotTotp = config.get<string>('application.demoSeedTotpSecrets.wurstbrot')
+  return users.map((u) => u.key === 'timo' ? { ...u, totpSecret: wurstbrotTotp } : u)
 }
 
 export interface StaticChallenge {

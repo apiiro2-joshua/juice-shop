@@ -110,6 +110,9 @@ application:
           type: string
         proxy:
           type: string
+  demoSeedTotpSecrets:
+    wurstbrot:
+      type: string
 challenges:
   showSolvedNotifications:
     type: boolean

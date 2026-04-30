@@ -70,6 +70,9 @@ export interface ApplicationConfig {
     clientId: string
     authorizedRedirects: Array<{ uri: string, proxy?: string }>
   }
+  demoSeedTotpSecrets: {
+    wurstbrot: string
+  }
 }
 
 export interface ChallengesConfig {

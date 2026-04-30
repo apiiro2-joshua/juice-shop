@@ -153,7 +153,7 @@
     "html-entities": "^1.4.0",
     "i18n": "^0.11.1",
     "js-yaml": "^3.14.0",
-    "jsonwebtoken": "0.4.0",
+    "jsonwebtoken": "^9.0.2",
     "jssha": "^3.3.1",
     "juicy-chat-bot": "~0.9.0",
     "libxmljs2": "~0.37.0",
@@ -212,7 +212,6 @@
     "@types/i18n": "^0.12.0",
     "@types/jest": "^26.0.24",
     "@types/js-yaml": "^3.12.10",
-    "@types/jsonwebtoken": "^8.5.9",
     "@types/jws": "^3.2.10",
     "@types/lodash": "^4.17.14",
     "@types/mocha": "^8.2.3",
@@ -273,6 +272,9 @@
     "arm64",
     "arm"
   ],
+  "overrides": {
+    "lodash": "^4.17.21"
+  },
   "heroku-run-build-script": true,
   "standard": {
     "global": [
